@@ -1,7 +1,7 @@
-chrome.runtime.onMessage.addListener( // this is the message listener
+chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
         if (request.message === "lerDOM") {
-            return new Promise((resolve, reject) => {
+            new Promise(async (resolve, reject) => {
                 const elements = document.querySelectorAll('.relative > .relative div.absolute.text-white.p-1>div>img');
 
                 const times = [];
@@ -16,15 +16,24 @@ chrome.runtime.onMessage.addListener( // this is the message listener
                     })
                 });
 
-                resolve(fetch('http://127.0.0.1:3000/', {
+                const ft = fetch('http://127.0.0.1:3000/', {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(times)
-                }).then(e => e.json()))
+                });
+
+                resolve(ft)
             })
+                .then(e => e.json())
+                .then((d) => {
+                    console.log(d);
+                    return sendResponse(d)
+                })
         }
+
+        return true;
     }
 );

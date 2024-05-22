@@ -13,17 +13,19 @@ body {
 .tiki-taka-toe {
     margin-bottom: 1rem;
     width: 100%;
-    background-color: #319F4F !important;
     display: flex;
     flex-wrap: wrap;
 
     div {
+        background-color: #319F4F !important;
         flex-grow: 1;
-        width: 33%;
+        width: 30%;
         height: 100px;
         text-align: center;
         display: flex;
         justify-content: center;
         align-items: center;
+        font-size: 10px;
+        margin: 5px;
     }
 }
