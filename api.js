@@ -1,10 +1,21 @@
 const express = require('express');
 const { Sequelize, QueryTypes } = require('sequelize');
-const { montarDominios } = require('../montarDominios');
-const { iniciarBanco } = require('../iniciarBanco');
+const { montarDominios } = require('./montarDominios');
+const { iniciarBanco } = require('./iniciarBanco');
 
 const app = express();
+const cors = require('cors') 
+
+app.use(cors());
 app.use(express.json());
+
+const shuffleAndSlice = (itens, qtd) => {
+    itens = itens.sort( () => Math.random() - 0.5).slice(0, qtd);
+
+    return itens.map(e => {
+        return `${e.nome} - ${e.dataNascimento}`
+    }).join(', ')
+}
 
 const buscarJogadores = (sequelize, times) => {
     return new Promise(async (resolve, reject) => {
@@ -19,13 +30,17 @@ const buscarJogadores = (sequelize, times) => {
                 const timeY = timesY[y];
 
                 let prompt = null;
-                if (!timeX.isNacao && !timeY.isNacao) {
+                
+                if (timeX.isTime && timeY.isTime) {
                     const res = await consultarTimes(sequelize, timeX.nomeTime, timeY.nomeTime)
-                    prompt = 'Teste';
-                } else {
-                    const nacao = [timeX, timeY].find(e => e.isNacao);
-                    const time = [timeX, timeY].find(e => !e.isNacao)
-                    prompt = (`Cite o nome e data de nascimento de um jogador nascido em ${nacao.nomeTime} e joga ou já jogou clube Brasileiro ${time.nomeTime}.`)
+                    prompt = shuffleAndSlice(res, 3);
+                }
+
+                if((timeX.isNacao && timeY.isTime) || (timeY.isNacao && timeX.isTime)) {
+                    const time = [timeX, timeY].find(e => e.isTime);
+                    const nacionalidade = [timeX, timeY].find(e => e.isNacao);
+                    const res = await consultarTimeNacao(sequelize, time.nomeTime, nacionalidade.nomeTime)
+                    prompt = shuffleAndSlice(res, 3);
                 }
 
                 testes.push({
@@ -53,6 +68,19 @@ const consultarTimes = async (sequelize, time1, time2) => {
     })
 }
 
+const consultarTimeNacao = async (sequelize, time, nacao) => {
+    const query = `select c.* from (
+        select b.nome, b.dataNascimento, count(*) as total, group_concat(time) from (
+            select distinct nome, time, dataNascimento, nacionalidade from jogadors
+        ) b where b.time = '${time}' and b.nacionalidade = '${nacao}'
+        group by b.nome
+    ) c`;
+
+    return await sequelize.query(query, { 
+        type: QueryTypes.SELECT
+    })
+}
+
 app.listen(3000, () => {
     console.log('API iniciada');
 });
@@ -64,6 +92,6 @@ app.post("/", (request, response) => {
         .then(sequelize => montarDominios(sequelize))
         .then(obj => buscarJogadores(obj.sequelize, request.body))
         .then(e => {
-            response.send(200);
+            response.send(e);
         })
 });
