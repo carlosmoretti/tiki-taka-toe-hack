@@ -1,0 +1,11 @@
+{
+  "name": "chrome_ext",
+  "version": "1.0.0",
+  "description": "<div align=\"center\">     <img src=\"https://raw.githubusercontent.com/SimGus/chrome-addon-v3-starter/master/logo/logo-128.png\"/>     <h1>Chrome Extension v3 Starter</h1>     <h3>A minimal template of a Chrome v3 addon</h3> </div>",
+  "main": "foreground.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
