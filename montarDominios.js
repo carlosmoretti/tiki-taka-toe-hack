@@ -13,12 +13,15 @@ const montarDominios = (sequelize) => {
             isCampeaoLibertadores: DataTypes.BOOLEAN,
             isCampeaoCopaDoBrasil: DataTypes.BOOLEAN,
             isCampeaoSupercopa: DataTypes.BOOLEAN,
+            isCampeaoChampions: DataTypes.BOOLEAN,
+            isCampeaoCopaMundo: DataTypes.BOOLEAN,
+            isCampeaoCopaAmerica: DataTypes.BOOLEAN,
             isArtilheiro: DataTypes.BOOLEAN,
             dataNascimento: DataTypes.STRING,
-            nacionalidade: DataTypes.STRING
+            nacionalidade: DataTypes.STRING,
         });
 
-        // jogadores.sync({ force: true });
+        // jogadores.sync({ alter: true });
         resolve({ sequelize, jogadores });
     })
 }

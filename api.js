@@ -17,6 +17,11 @@ const shuffleAndSlice = (itens, qtd) => {
     }).join(', ')
 }
 
+const mapTimeTaca = [
+    { nomeTaca: 'Brazilian League Top Scorer', prop: 'isArtilheiro' },
+    { nomeTaca: 'Brazilian Top Division', prop: 'isCampeaoBrasileiro' }
+]
+
 const buscarJogadores = (sequelize, times) => {
     return new Promise(async (resolve, reject) => {
 
@@ -43,6 +48,14 @@ const buscarJogadores = (sequelize, times) => {
                     prompt = shuffleAndSlice(res, 3);
                 }
 
+                if((timeX.isTaca && timeY.isTime) || (timeY.isTaca && timeX.isTime)) {
+                    const time = [timeX, timeY].find(e => e.isTime);
+                    const taca = [timeX, timeY].find(e => e.isTaca);
+                    const prop = mapTimeTaca.find(e => e.nomeTaca == taca.nomeTime).prop;
+                    const res = await consultarTimeTaca(sequelize, time.nomeTime, prop)
+                    prompt = shuffleAndSlice(res, 3);
+                }
+
                 testes.push({
                     prompt,
                     titulo: `${timeX.nomeTime} x ${timeY.nomeTime}`,
@@ -51,6 +64,19 @@ const buscarJogadores = (sequelize, times) => {
         }
 
         resolve(testes)
+    })
+}
+
+const consultarTimeTaca = async (sequelize, time, prop) => {
+    const query = `select c.* from (
+        select b.nome, b.dataNascimento, count(*) as total, group_concat(time) from (
+            select distinct nome, time, dataNascimento, nacionalidade, ${prop} from jogadors
+        ) b where b.time = '${time}' and b.${prop} = 1
+        group by b.nome
+    ) c`;
+
+    return await sequelize.query(query, { 
+        type: QueryTypes.SELECT
     })
 }
 
