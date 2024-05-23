@@ -19,7 +19,11 @@ const shuffleAndSlice = (itens, qtd) => {
 
 const mapTimeTaca = [
     { nomeTaca: 'Brazilian League Top Scorer', prop: 'isArtilheiro' },
-    { nomeTaca: 'Brazilian Top Division', prop: 'isCampeaoBrasileiro' }
+    { nomeTaca: 'Brazilian Top Division', prop: 'isCampeaoBrasileiro' },
+    { nomeTaca: 'Copa América', prop: 'isCampeaoCopaAmerica' },
+    { nomeTaca: 'World Cup', prop: 'isCampeaoCopaMundo'},
+    { nomeTaca: 'Champions League', prop: 'isCampeaoChampions' },
+    { nomeTaca: 'Copa do Brasil', prop: 'isCampeaoCopaDoBrasil'}
 ]
 
 const buscarJogadores = (sequelize, times) => {
@@ -69,8 +73,8 @@ const buscarJogadores = (sequelize, times) => {
 
 const consultarTimeTaca = async (sequelize, time, prop) => {
     const query = `select c.* from (
-        select b.nome, b.dataNascimento, count(*) as total, group_concat(time) from (
-            select distinct nome, time, dataNascimento, nacionalidade, ${prop} from jogadors
+        select b.guid, b.nome, b.dataNascimento, count(*) as total, group_concat(time) from (
+            select distinct guid, nome, time, dataNascimento, nacionalidade, ${prop} from jogadors
         ) b where b.time = '${time}' and b.${prop} = 1
         group by b.nome
     ) c`;
@@ -82,8 +86,8 @@ const consultarTimeTaca = async (sequelize, time, prop) => {
 
 const consultarTimes = async (sequelize, time1, time2) => {
     const query = `select c.* from (
-            select b.nome, b.dataNascimento, count(*) as total, group_concat(time) from (
-                select distinct nome, time, dataNascimento from jogadors
+            select b.guid, b.nome, b.dataNascimento, count(*) as total, group_concat(time) from (
+                select distinct guid, nome, time, dataNascimento from jogadors
             ) b where b.time in ('${time1}', '${time2}')
             group by b.nome
         ) c
@@ -96,8 +100,8 @@ const consultarTimes = async (sequelize, time1, time2) => {
 
 const consultarTimeNacao = async (sequelize, time, nacao) => {
     const query = `select c.* from (
-        select b.nome, b.dataNascimento, count(*) as total, group_concat(time) from (
-            select distinct nome, time, dataNascimento, nacionalidade from jogadors
+        select b.guid, b.nome, b.dataNascimento, count(*) as total, group_concat(time) from (
+            select distinct guid, nome, time, dataNascimento, nacionalidade from jogadors
         ) b where b.time = '${time}' and b.nacionalidade = '${nacao}'
         group by b.nome
     ) c`;
